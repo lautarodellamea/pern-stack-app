@@ -15,8 +15,8 @@ app.use(express.urlencoded({ extended: false }));
 app.get('/', (req, res) => {
   res.json({ message: "welcome to my API" })
 })
-app.use("/api", tasksRoutes)
-app.use("/api", authRoutes)
+app.use("/api/tasks", tasksRoutes)
+app.use("/api/auth", authRoutes)
 
 
 
