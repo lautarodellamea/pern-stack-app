@@ -1,11 +1,24 @@
 import { pool } from '../db.js'
 
 
-export const getAllTasks = async (req, res) => res.send("obteniendo tareas")
+export const getAllTasks = async (req, res) => {
+  const result = await pool.query("SELECT * FROM task")
+  return res.json(result.rows)
+}
 
 
 
-export const getTask = async (req, res) => res.send("obteniendo una tarea")
+export const getTask = async (req, res) => {
+  const result = await pool.query("SELECT * FROM task WHERE id = $1", [req.params.id])
+  console.log(result)
+
+
+  if (result.rowCount === 0) {
+    return res.status(404).json({ message: "No existe una tarea con ese id" })
+  }
+  return res.json(result.rows[0])
+
+}
 
 
 
@@ -30,7 +43,7 @@ export const createTask = async (req, res, next) => {
 
     // logica a ejecutar segun el error (los errores tienen codigos en postgres)
     if (error.code === "23505") {
-      return res.status(400).send("ya existe una tarea con ese nombre")
+      return res.status(409).json({ message: "ya existe una tarea con ese titulo" })
     }
 
     // de esta forma le decimos que vaya al siguiente middleware, pero al enviarle el error va hacia el handler error
@@ -43,10 +56,37 @@ export const createTask = async (req, res, next) => {
 
 
 
-export const updateTask = async (req, res) => res.send("actualizando tarea")
+export const updateTask = async (req, res) => {
+  const id = req.params.id
+  const { title, description } = req.body
+
+  const result = await pool.query("UPDATE task SET title = $1, description = $2 WHERE id = $3 RETURNING *", [title, description, id])
+
+
+  if (result.rowCount === 0) {
+    return res.status(404).json({ message: "No existe una tarea con ese id" })
+  }
+
+  return res.json(result.rows[0])
+
+
+}
 
 
 
-export const deleteTask = async (req, res) => res.send("borando tarea")
+export const deleteTask = async (req, res) => {
+  const result = await pool.query("DELETE FROM task WHERE id = $1 ", [req.params.id])
+  console.log(result)
+
+  // el rowCount es el numero de filas afectadas en este caso por el DELETE
+  if (result.rowCount === 0) {
+    return res.status(404).json({ message: "No existe una tarea con ese id" })
+  }
+
+  // cuando eliminamos por lo general no retornamos nada, sino que un codigo 204 indica que todo ha ido bien
+  return res.sendStatus(204)
+
+
+}
 
 
