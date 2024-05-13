@@ -2,6 +2,14 @@ import { pool } from '../db.js'
 
 
 export const getAllTasks = async (req, res) => {
+
+  // vemos el header, es en donde viene mi token
+  // console.log(req.headers)
+  // crearemos un middleware para ver si el token existe o no
+
+  // ceamos quien hace la peticion
+  console.log(req.userId)
+
   const result = await pool.query("SELECT * FROM task")
   return res.json(result.rows)
 }

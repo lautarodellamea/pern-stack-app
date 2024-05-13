@@ -4,16 +4,18 @@ import Router from 'express-promise-router'
 
 import { getAllTasks, getTask, createTask, updateTask, deleteTask } from '../controllers/tasks.controller.js'
 
+import { isAuth } from '../middlewares/auth.middleware.js'
+
 const router = Router()
 
-router.get("/", getAllTasks)
+router.get("/", isAuth, getAllTasks)
 
-router.get("/:id", getTask)
+router.get("/:id", isAuth, getTask)
 
-router.post("/", createTask)
+router.post("/", isAuth, createTask)
 
-router.put("/:id", updateTask)
+router.put("/:id", isAuth, updateTask)
 
-router.delete("/:id", deleteTask)
+router.delete("/:id", isAuth, deleteTask)
 
 export default router

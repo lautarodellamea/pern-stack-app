@@ -6,6 +6,9 @@ import { createAccessToken } from '../libs/jwt.js'
 export const signin = async (req, res) => res.send("iniciando sesion")
 
 export const signup = async (req, res) => {
+
+
+
   const { name, email, password } = req.body
   console.log(name, email, password)
 
@@ -25,9 +28,18 @@ export const signup = async (req, res) => {
     // genero el token y le pasamos lo que queremos guardar en el
     const token = await createAccessToken({ id: result.rows[0].id })
 
+    // guardemos el token en una cookie
+    // este se envia al cliente en el header 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 24 * 60 * 60 * 1000 // 1 dia
+    })
 
-    // return res.json(result.rows[0])
-    return res.json({ token: token })
+
+    return res.json(result.rows[0])
+    // return res.json({ token: token })
   } catch (error) {
     if (error.code === "23505") {
       return res.status(400).json({ message: "El email ya esta registrado" })
