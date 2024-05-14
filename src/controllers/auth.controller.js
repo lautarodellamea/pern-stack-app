@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt'
+import md5 from 'md5'
 import { pool } from '../db.js'
 import { createAccessToken } from '../libs/jwt.js'
+
 
 
 export const signin = async (req, res) => {
@@ -54,10 +56,13 @@ export const signup = async (req, res, next) => {
     // encriptar contraseña con bcrypt en 10 vueltas
     const salt = bcrypt.genSaltSync(10)
     const hashedPassword = bcrypt.hashSync(password, salt)
-    console.log(hashedPassword)
+    // console.log(hashedPassword)
+
+    // creamos el avatar mediante md5 
+    const gravatar = `https://www.gravatar.com/avatar/${md5(email)}`
 
 
-    const result = await pool.query("INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *", [name, email, hashedPassword])
+    const result = await pool.query("INSERT INTO users (name, email, password, gravatar) VALUES ($1, $2, $3, $4) RETURNING *", [name, email, hashedPassword, gravatar])
 
 
     console.log(result)

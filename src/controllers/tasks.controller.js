@@ -8,9 +8,9 @@ export const getAllTasks = async (req, res) => {
   // crearemos un middleware para ver si el token existe o no
 
   // ceamos quien hace la peticion
-  console.log(req.userId)
+  // console.log(req.userId)
 
-  const result = await pool.query("SELECT * FROM task")
+  const result = await pool.query("SELECT * FROM task WHERE user_id = $1", [req.userId])
   return res.json(result.rows)
 }
 
@@ -39,7 +39,7 @@ export const createTask = async (req, res, next) => {
   // colocamos todo dentro de un try catch porque si llegamos a tener un error por la parte de la base dedatos, me crashea la aplicacion y no puedo seguir haciendo consultas, no llega a caer a mi manejador de error (error handler) en el app.js
   try {
     // db insert
-    const result = await pool.query("INSERT INTO task (title, description) VALUES ($1, $2) RETURNING *", [title, description])
+    const result = await pool.query("INSERT INTO task (title, description, user_id) VALUES ($1, $2, $3) RETURNING *", [title, description, req.userId])
     // console.log(result)
 
     // si quisieramos hacer otras consultas podemos llamar varias veces el pool.query
